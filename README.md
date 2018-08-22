@@ -11,7 +11,7 @@ The name stands for **Reactive React Store**. This package provides an easy to i
 npm install rxjs r2s
 ```
 
-* Create the actions:
+### Create the actions:
 
 ```javascript
 //store/counter/actions.js
@@ -36,7 +36,7 @@ const counterActions = {
 export default counterActions
 ```
 
-## Create Reducers
+### Create Reducers
 ```javascript
 //store/counter/reducer.js
 import { of } from 'rxjs';
@@ -61,12 +61,12 @@ Each stream's content is [**map**](https://rxjs-dev.firebaseapp.com/api/operator
 
 If our Subject had a payload, it would be the first argument of the function, as an example:
 ```javascript
-counterActions.setValue.pipe(map(payload => () => value))
+counterActions.setValue.pipe(map(payload => () => payload))
 //or
 counterActions.addValue.pipe(map(payload => state => state + payload))
 ```
 
-## Combine Reducers and create the Store
+### Combine Reducers and create the Store
 
 ```javascript
 //store/store.js
@@ -84,7 +84,7 @@ export default store;
 Here we add all our reducers passing an object. The property name will be the same in the State.
 Then we create and export our Store.
 
-## Add Provider to our App
+### Add Provider to our App
 
 ```javascript
 //index.js
@@ -98,7 +98,7 @@ ReactDOM.render(
   document.getElementById('root'));
 ```
 
-## Create a component and connect to the store
+### Create a component and connect to the store
 
 ```javascript
 //Counter.js
@@ -126,7 +126,7 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps, counterActions)(Counter)
 ```
 
-The first argument of the connect function is a function which receives the state and returns and object, which will be passed to the component as Props. The rest of the arguments are actions objects (the ones with Subjects) which will be passed as props functions.
+The first argument of the connect function is a function which receives the state and returns an object, which will be passed to the component as Props. The rest of the arguments are actions objects (the ones with Subjects) which will be passed as props functions.
 
 The connect can receive n actions objects as arguments, as follows:
 ```javascript
