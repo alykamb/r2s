@@ -1,5 +1,4 @@
 # r2s
-# r2s
 
 Based on the work of [Michal Zalecki](https://github.com/MichalZalecki/connect-rxjs-to-react). I updated the code to support the React 16 and Rxjs 6 and made a few changes to make easier to create the store.
 
