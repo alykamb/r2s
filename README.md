@@ -106,13 +106,13 @@ import React from 'react';
 import {connect} from 'r2s';
 import counterActions from './store/counter/actions'
 
-function Counter({counter, increase, decrease, reset}) {
+function Counter(props) {
   return (
     <div>
-      <h1>{this.props.counter}</h1>
-      <button onClick={this.props.increase}>Increase</button>
-      <button onClick={this.props.decrease}>Decrease</button>
-      <button onClick={this.props.reset}>Reset</button>
+      <h1>{props.counter}</h1>
+      <button onClick={props.increase}>Increase</button>
+      <button onClick={props.decrease}>Decrease</button>
+      <button onClick={props.reset}>Reset</button>
     </div>
   )
 }
