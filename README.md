@@ -267,22 +267,8 @@ import anotherActions from '../another/actions'
 tap(payload =>  {  if(!payload.error)  { anotherActions.doStuff.next(payload)  }  })
 ```
 
-## A flow diagram of the entire flux
+## A diagram of the entire flux
 
-```mermaid
-graph LR
-A[Actions] --> B[Effects]
-S[Side Effect] -- Dispatch --> A
-B -- Tap --> S
-B -- Promise --> E(External Api)
-E -- Response --> B
-B --> C[Reducers]
-A --> C
-C --> D{Store}
-D -- connect --> F((Components))
-F -- dispatch Actions --> A
-And that covers all the functionality.
-# Files
-```
+[diagram](https://mermaidjs.github.io/mermaid-live-editor/#/view/eyJjb2RlIjoiZ3JhcGggTFJcbkFbQWN0aW9uc10gLS0-IEJbRWZmZWN0c11cblNbU2lkZSBFZmZlY3RdIC0tIERpc3BhdGNoIC0tPiBBXG5CIC0tIFRhcCAtLT4gU1xuQiAtLSBQcm9taXNlIC0tPiBFKEV4dGVybmFsIEFwaSlcbkUgLS0gUmVzcG9uc2UgLS0-IEJcbkIgLS0-IENbUmVkdWNlcnNdXG5BIC0tPiBDXG5DIC0tPiBEe1N0b3JlfVxuRCAtLSBjb25uZWN0IC0tPiBGKChDb21wb25lbnRzKSlcbkYgLS0gZGlzcGF0Y2ggQWN0aW9ucyAtLT4gQVxuIiwibWVybWFpZCI6eyJ0aGVtZSI6ImRlZmF1bHQifX0)
 
 Of course it is just an example, you can add any operator to the pipes and change the data as you need.
