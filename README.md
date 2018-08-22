@@ -222,7 +222,7 @@ const AuthReducer$ = of(state => ({...initialState, ...state}))
 
 The [**Tap**](https://rxjs-dev.firebaseapp.com/api/operators/tap)  operator makes easy to handle side effects within the application.
 
-After a successfully login when can redirect the user to the dashboard. Creating a history object with [**history**](https://github.com/ReactTraining/history), we can use it along the tap operator in the login effect pipe:
+After a successfully login we can redirect the user to the dashboard. Creating a history object with [**history**](https://github.com/ReactTraining/history), we can use it along the tap operator in the login effect pipe:
 
 create a history.js:
 ```javascript
@@ -238,7 +238,7 @@ import authActions from "./auth.actions";
 import { from, of} from "rxjs";
 import { switchMap, tap, map, catchError} from 'rxjs/operators'; // <- add tap
 
-import history from '../history'
+import history from '../../history'
 
 export default {
 	login:authActions.login
