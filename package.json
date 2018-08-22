@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alykam/r2s.git"
+    "url": "git+https://github.com/alykamb/r2s.git"
   },
   "keywords": [
     "React",
@@ -22,9 +22,9 @@
   "author": "Alykam Burdzaki <alykam@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/alykam/r2s/issues"
+    "url": "https://github.com/alykamb/r2s/issues"
   },
-  "homepage": "https://github.com/alykam/r2s#readme",
+  "homepage": "https://github.com/alykamb/r2s#readme",
   "dependencies": {
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
