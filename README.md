@@ -1,5 +1,4 @@
 # r2s
-# r2s
 
 Based on the work of [Michal Zalecki](https://github.com/MichalZalecki/connect-rxjs-to-react). I updated the code to support the React 16 and Rxjs 6 and made a few changes to make easier to create the store.
 
@@ -12,7 +11,7 @@ The name stands for **Reactive React Store**. This package provides an easy to i
 npm install rxjs r2s
 ```
 
-* Create the actions:
+### Create the actions:
 
 ```javascript
 //store/counter/actions.js
@@ -37,7 +36,7 @@ const counterActions = {
 export default counterActions
 ```
 
-## Create Reducers
+### Create Reducers
 ```javascript
 //store/counter/reducer.js
 import { of } from 'rxjs';
@@ -62,12 +61,12 @@ Each stream's content is [**map**](https://rxjs-dev.firebaseapp.com/api/operator
 
 If our Subject had a payload, it would be the first argument of the function, as an example:
 ```javascript
-counterActions.setValue.pipe(map(payload => () => value))
+counterActions.setValue.pipe(map(payload => () => payload))
 //or
 counterActions.addValue.pipe(map(payload => state => state + payload))
 ```
 
-## Combine Reducers and create the Store
+### Combine Reducers and create the Store
 
 ```javascript
 //store/store.js
@@ -85,7 +84,7 @@ export default store;
 Here we add all our reducers passing an object. The property name will be the same in the State.
 Then we create and export our Store.
 
-## Add Provider to our App
+### Add Provider to our App
 
 ```javascript
 //index.js
@@ -99,7 +98,7 @@ ReactDOM.render(
   document.getElementById('root'));
 ```
 
-## Create a component and connect to the store
+### Create a component and connect to the store
 
 ```javascript
 //Counter.js
@@ -127,7 +126,7 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps, counterActions)(Counter)
 ```
 
-The first argument of the connect function is a function which receives the state and returns and object, which will be passed to the component as Props. The rest of the arguments are actions objects (the ones with Subjects) which will be passed as props functions.
+The first argument of the connect function is a function which receives the state and returns an object, which will be passed to the component as Props. The rest of the arguments are actions objects (the ones with Subjects) which will be passed as props functions.
 
 The connect can receive n actions objects as arguments, as follows:
 ```javascript
@@ -268,22 +267,8 @@ import anotherActions from '../another/actions'
 tap(payload =>  {  if(!payload.error)  { anotherActions.doStuff.next(payload)  }  })
 ```
 
-## A flow diagram of the entire flux
+## A diagram of the entire flux
 
-```mermaid
-graph LR
-A[Actions] --> B[Effects]
-S[Side Effect] -- Dispatch --> A
-B -- Tap --> S
-B -- Promise --> E(External Api)
-E -- Response --> B
-B --> C[Reducers]
-A --> C
-C --> D{Store}
-D -- connect --> F((Components))
-F -- dispatch Actions --> A
-And that covers all the functionality.
-# Files
-```
+[diagram](https://mermaidjs.github.io/mermaid-live-editor/#/view/eyJjb2RlIjoiZ3JhcGggTFJcbkFbQWN0aW9uc10gLS0-IEJbRWZmZWN0c11cblNbU2lkZSBFZmZlY3RdIC0tIERpc3BhdGNoIC0tPiBBXG5CIC0tIFRhcCAtLT4gU1xuQiAtLSBQcm9taXNlIC0tPiBFKEV4dGVybmFsIEFwaSlcbkUgLS0gUmVzcG9uc2UgLS0-IEJcbkIgLS0-IENbUmVkdWNlcnNdXG5BIC0tPiBDXG5DIC0tPiBEe1N0b3JlfVxuRCAtLSBjb25uZWN0IC0tPiBGKChDb21wb25lbnRzKSlcbkYgLS0gZGlzcGF0Y2ggQWN0aW9ucyAtLT4gQVxuIiwibWVybWFpZCI6eyJ0aGVtZSI6ImRlZmF1bHQifX0)
 
 Of course it is just an example, you can add any operator to the pipes and change the data as you need.
