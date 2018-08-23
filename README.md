@@ -229,7 +229,7 @@ create a history.js:
 //history.js
 import createHistory from "history/createBrowserHistory"
 
-export default = createHistory();
+export default createHistory();
 ```
 auth/effects.js:
 ```javascript
