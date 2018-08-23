@@ -11,7 +11,6 @@ export function createActions(actionNames, sufix = '') {
   return actionNames.reduce((akk, name) => ({ ...akk, [name+sufix]: createAction() }), {});
 }
 
-
 export function combineReducers(observables) {
   return Object.keys(observables).map(scope => observables[scope].pipe(map(reducer => [scope, {[scope]:reducer}])))
 }

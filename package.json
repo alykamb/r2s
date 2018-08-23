@@ -1,8 +1,9 @@
 {
   "name": "r2s",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A Rxjs state management library for React",
   "main": "build/index.js",
+  "typings": "index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack --watch",
@@ -31,6 +32,7 @@
     "rxjs": "^6.2.2"
   },
   "devDependencies": {
+    "@types/react": "^16.4.11",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
