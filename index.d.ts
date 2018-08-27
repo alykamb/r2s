@@ -13,7 +13,7 @@ export function createActions<t = actions>(actionNames:string[], sufix?:string):
 
 export function combineReducers<t = storeReducer[]>(observables:{[key:string]:reducer}):t
 
-export function createStore<t = any>(reducers:storeReducer[], initialState:t): Observable<t>
+export function createStore<t = any>(reducers:storeReducer[], initialState?:t): Observable<t>
 
 export type mapStateToProps = (state) => any
 
