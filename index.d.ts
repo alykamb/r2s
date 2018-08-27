@@ -11,7 +11,7 @@ export function createAction<t>():Subject<t>
 
 export function createActions<t = actions>(actionNames:string[], sufix?:string):t
 
-export function combineReducers<t = storeReducer[]>(observables:reducer[]):t
+export function combineReducers<t = storeReducer[]>(observables:{[key:string]:reducer}):t
 
 export function createStore<t = any>(reducers:storeReducer[], initialState:t): Observable<t>
 
