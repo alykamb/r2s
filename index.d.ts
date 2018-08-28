@@ -23,7 +23,7 @@ export class Connect extends React.Component {
   };
 }
 
-export function connect(selector:mapStateToProps, ...actionSubjectsArray:actions[]):(component:React.Component | Function) => Connect;
+export function connect(selector:mapStateToProps, ...actionSubjectsArray:actions[]):(component: typeof React.Component | React.SFC) => () => Connect;
 
 export interface ProviderContext<t = any> {
     state$: Observable<t>
