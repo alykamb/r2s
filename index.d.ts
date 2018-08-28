@@ -17,13 +17,7 @@ export function createStore<t = any>(reducers:storeReducer[], initialState?:t): 
 
 export type mapStateToProps = (state) => any
 
-export class Connect extends React.Component {
-  static contextTypes: {
-    state$: any
-  };
-}
-
-export function connect(selector:mapStateToProps, ...actionSubjectsArray:actions[]):(component: typeof React.Component | React.SFC) => () => Connect;
+export function connect(selector:mapStateToProps, ...actionSubjectsArray:actions[]):(component: typeof React.Component | React.SFC) => typeof React.Component;
 
 export interface ProviderContext<t = any> {
     state$: Observable<t>
