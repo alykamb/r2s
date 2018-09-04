@@ -11,30 +11,24 @@ export function createAction<t>():Subject<t>
 
 export function createActions<t = actions>(actionNames:string[], sufix?:string):t
 
-export function combineReducers<t = storeReducer[]>(observables:reducer[]):t
+export function combineReducers<t = storeReducer[]>(observables:{[key:string]:reducer}):t
 
-export function createStore<t = any>(reducers:storeReducer[], initialState:t): Observable<t>
+export function createStore<t = any>(reducers:storeReducer[], initialState?:t): Observable<t>
 
 export type mapStateToProps = (state) => any
 
-export class Connect extends React.Component {
-  static contextTypes: {
-    state$: any
-  };
-}
+export function connect(selector:mapStateToProps, ...actionSubjectsArray:actions[]):(component: typeof React.Component | React.SFC) => typeof React.Component;
 
-export function connect(selector:mapStateToProps, ...actionSubjectsArray:actions[]):(component:React.Component | Function) => Connect;
-
-export interface ProviderContext {
-    state$: Observable<any>
+export interface ProviderContext<t = any> {
+    state$: Observable<t>
 }
 
 export interface ProviderProps<t = any> {
   state$: Observable<t>,
-  children: React.ReactNode[] | React.ReactNode[]
+  children: React.ReactNode[] | React.ReactNode | JSX.Element[] | JSX.Element
 }
 
-export class Provider<t = any> extends React.Component<ProviderProps<t>, void> {
+export class Provider<t = any> extends React.Component<ProviderProps<t>, Readonly<{}>, ProviderContext<t>> {
     static childContextTypes: {
         state$: Observable<any>
     }
