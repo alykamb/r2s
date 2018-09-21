@@ -1,4 +1,5 @@
 import * as React from 'react'
+
 import {Subject, Observable} from 'rxjs'
 
 export as namespace r2s;
@@ -7,15 +8,17 @@ export type reducer<t = any> = Observable<t>
 export type storeReducer<t = any> = Observable<[string, {[key:string]:t}]>
 export interface Actions {[key:string]:Subject<any>}
 
+export const mapToState
+
 export function createAction<t>():Subject<t>
 
 export function createActions<t>(actionNames:string[], sufix?:string):t
 
-export function createReducers<t = any>(initialState:t, reducers:Array<Observable<(a?:t) => any>>):Observable<t>
+export function createReducers<t = any>(initialState:t, reducers?:Array<Observable<(a?:t) => any>>):Observable<t>
 
 export function combineReducers<t>(observables:{[key:string]:reducer}):t
 
-export function createStore<t = any>(reducers:storeReducer[], initialState?:t): Observable<t>
+export function createStore<t = any>(reducers:{[key:string]:Observable<any>}): Observable<t>
 
 export type mapStateToProps = (state) => any
 
