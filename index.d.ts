@@ -11,7 +11,7 @@ export function createAction<t>():Subject<t>
 
 export function createActions<t>(actionNames:string[], sufix?:string):t
 
-export function createReducers<t = any>(initialState:t, actions:Array<Observable<(a?:t) => any>>):Observable<t>
+export function createReducers<t = any>(initialState:t, reducers:Array<Observable<(a?:t) => any>>):Observable<t>
 
 export function combineReducers<t>(observables:{[key:string]:reducer}):t
 
@@ -19,7 +19,7 @@ export function createStore<t = any>(reducers:storeReducer[], initialState?:t): 
 
 export type mapStateToProps = (state) => any
 
-export function connect(selector:mapStateToProps, actionSubjects:Actions, otherProps:{[key:string]:any}):(component: React.ComponentType<any>) => typeof React.Component;
+export function connect(selector:mapStateToProps, actionSubjects?:Actions, otherProps?:{[key:string]:any}):(component: React.ComponentType<any>) => typeof React.Component;
 
 export interface ProviderContext<t = any> {
     state$: Observable<t>
