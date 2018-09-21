@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import {Subject, of, Observable } from "rxjs";
-import { scan, merge, publishReplay, refCount, map} from 'rxjs/operators';
+import {BehaviorSubject, Observable, of, pipe, Subject } from "rxjs";
+import { combineAll, map, merge, mergeAll, mergeScan, switchMap, tap } from 'rxjs/operators';
 
 export function createAction() {
   return new Subject();
@@ -12,46 +12,69 @@ export function createActions(actionNames, sufix = '') {
 }
 
 export function combineReducers(observables) {
-  return Object.keys(observables).map(scope => observables[scope].pipe(map(reducer => [scope, {[scope]:reducer}])))
+  return observables
 }
 
-export function createStore (reducers, initialState = {}) {
-  const initialState$ = of(initialState)
-  return new Observable().pipe(
-    merge(initialState$, ...reducers),
-    scan((state, [scope, reducer]) =>{
-      return { ...state, [scope]: reducer[scope](state[scope]) }
-    }),
-    publishReplay(1),
-    refCount()
+export function createReducers(initialState = null, reducers = []) {
+  return new BehaviorSubject(() => initialState)
+  .pipe(
+    merge(
+      ...reducers
+    ),
+    mergeScan((state, reducer) => {
+      return of(reducer(state))
+    }, initialState)
   )
 }
 
-export function connect(selector = state => state, ...actionSubjectsArray) {
-  let actions = {}
-  actionSubjectsArray.forEach((actionSubjects) => {
-    const a = Object.keys(actionSubjects)
-    .reduce((akk, key) => ({ ...akk, [key]: value => actionSubjects[key].next(value) }), {})
-    actions = {...actions, ...a}
+export const mapToState = pipe(
+  switchMap((o) => {
+    const keys = Object.keys(o)
+    return of(keys.map((k) => o[k])).pipe(
+      mergeAll(),
+      combineAll((...obs) => {
+        return obs.reduce((acc, ob, i) => ({...acc, [keys[i]]:ob}), {})
+      }),
+    )
   })
+)
+
+export function createStore(reducers) {
+  return of(reducers)
+}
+
+export function connect(selector = state => state, actionSubjects = {}, otherProps = {}) {
+  let actions = {}
+
+  const a = Object.keys(actionSubjects)
+  .reduce((akk, key) => ({ ...akk, [key]: value => actionSubjects[key].next(value) }), {})
+  actions = {...actions, ...a}
+
 
   return function wrapWithConnect(WrappedComponent) {
     return class Connect extends Component {
-      static contextTypes = {
+       static contextTypes = {
         state$: PropTypes.object.isRequired
       };
 
-      componentWillMount() {
-        this.subscription = this.context.state$.pipe(map(selector)).subscribe(state => {this.setState(state)});
+       subscription
+
+       componentWillMount() {
+        this.subscription = this.context.state$
+        .pipe(
+          map(selector),
+          mapToState,
+         )
+       .subscribe(state => {this.setState(state)});
       }
 
-      componentWillUnmount() {
+       componentWillUnmount() {
         this.subscription.unsubscribe();
       }
 
-      render() {
+       render() {
         return (
-          <WrappedComponent {...this.state} {...this.props} {...actions} />
+          <WrappedComponent {...this.state} {...this.props} {...otherProps} {...actions} />
         );
       }
     };
@@ -59,22 +82,22 @@ export function connect(selector = state => state, ...actionSubjectsArray) {
 }
 
 export class Provider extends Component {
-  static propTypes = {
-    state$: PropTypes.object.isRequired,
+   static propTypes = {
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.node),
       PropTypes.node
-    ]).isRequired
+    ]).isRequired,
+    state$: PropTypes.object.isRequired,
   };
 
-  static childContextTypes = {
+   static childContextTypes = {
     state$: PropTypes.object.isRequired
   };
-  getChildContext() {
+   getChildContext() {
     return { state$: this.props.state$ };
   }
 
-  render() {
+   render() {
     return this.props.children;
   }
 }

@@ -5,19 +5,21 @@ export as namespace r2s;
 
 export type reducer<t = any> = Observable<t>
 export type storeReducer<t = any> = Observable<[string, {[key:string]:t}]>
-export type actions = {[key:string]:Subject<any>}
+export interface Actions {[key:string]:Subject<any>}
 
 export function createAction<t>():Subject<t>
 
-export function createActions<t = actions>(actionNames:string[], sufix?:string):t
+export function createActions<t>(actionNames:string[], sufix?:string):t
 
-export function combineReducers<t = storeReducer[]>(observables:{[key:string]:reducer}):t
+export function createReducers<t = any>(initialState:t, actions:Array<Observable<(a?:t) => any>>):Observable<t>
+
+export function combineReducers<t>(observables:{[key:string]:reducer}):t
 
 export function createStore<t = any>(reducers:storeReducer[], initialState?:t): Observable<t>
 
 export type mapStateToProps = (state) => any
 
-export function connect(selector:mapStateToProps, ...actionSubjectsArray:actions[]):(component: typeof React.Component | React.SFC) => typeof React.Component;
+export function connect(selector:mapStateToProps, actionSubjects:Actions, otherProps:{[key:string]:any}):(component: React.ComponentType<any>) => typeof React.Component;
 
 export interface ProviderContext<t = any> {
     state$: Observable<t>

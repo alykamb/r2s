@@ -1,6 +1,6 @@
 {
   "name": "r2s",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "A Rxjs state management library for React",
   "main": "build/index.js",
   "typings": "index.d.ts",
@@ -29,7 +29,7 @@
   "dependencies": {
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
-    "rxjs": "^6.3.1"
+    "rxjs": "^6.3.2"
   },
   "devDependencies": {
     "@types/react": "^16.4.11",
