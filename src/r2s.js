@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import {BehaviorSubject, Observable, of, pipe, Subject } from "rxjs";
-import { combineAll, map, merge, mergeAll, mergeScan, switchMap, tap } from 'rxjs/operators';
+import { combineAll, map, merge, mergeAll, mergeScan, switchMap, tap, publishReplay, refCount } from 'rxjs/operators';
 
 export function createAction() {
   return new Subject();
@@ -23,7 +23,9 @@ export function createReducers(initialState = null, reducers = []) {
     ),
     mergeScan((state, reducer) => {
       return of(reducer(state))
-    }, initialState)
+    }, initialState),
+    publishReplay(1),
+    refCount()
   )
 }
 

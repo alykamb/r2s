@@ -1,3 +1,4 @@
+
 # r2s
 
 Based on the work of [Michal Zalecki](https://github.com/MichalZalecki/connect-rxjs-to-react). I updated the code to support the React 16 and Rxjs 6 and made a few changes to make easier to create the store.
@@ -39,22 +40,46 @@ export default counterActions
 ### Create Reducers
 ```javascript
 //store/counter/reducer.js
-import { of } from 'rxjs';
-import { merge, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
+
+import counterActions from './actions';
+
+import {createReducers} from '@/r2s'
+
+const initialState = 0;
+
+const reducers = [
+	counterActions.increase.pipe(map(() => state => state + 1)),
+	counterActions.decrease.pipe(map(() => state => state - 1)),
+	counterActions.reset.pipe(map(() => () => initialState))
+]
+
+export default createReducers(initialState, reducers);
+
+```
+The **createReducers** function is an helper that creates an Behavior Subject and merges the functions from the reducers array. The Following code is equivalent to the above:
+```javascript
+//store/counter/reducer.js
+import { BehaviorSubject } from 'rxjs';
+import { map, merge, mergeScan, publishReplay, refCount } from 'rxjs/operators';
 
 import counterActions from './actions';
 
 const initialState = 0;
-const counterReducer$ = of(() => initialState)
+
+export default new BehaviorSubject(() => initialState)
 .pipe(
   merge(
     counterActions.increase.pipe(map(() => state => state + 1)),
-    counterActions.decrease.pipe(map(() => state => state - 1)),
-    counterActions.reset.pipe(map(() => () => initialState))
-    )
- );
-
-export default counterReducer$;
+  	counterActions.decrease.pipe(map(() => state => state - 1)),
+  	counterActions.reset.pipe(map(() => () => initialState))
+  ),
+  mergeScan((state, reducer) => {
+    return of(reducer(state))
+  }, initialState),
+  publishReplay(1),
+  refCount()
+)
 ```
 What we do is create a new observable from the initial state with [**of**](https://rxjs-dev.firebaseapp.com/api/index/function/of) and  [**merge**](https://rxjs-dev.firebaseapp.com/api/index/function/merge) all streams into a single Observable.
 Each stream's content is [**map**](https://rxjs-dev.firebaseapp.com/api/operators/map)ped to a function that receives the current state so we can use it to return the new one. This function is where the Reducers pure functions act, always returning a new state.
@@ -77,10 +102,22 @@ const reducers = combineReducers({
   counter: counterReducer$
 })
 
-const store = createStore(reducers);
-export default store;
+const store$ = createStore(reducers);
+export default store$;
 ```
+As of 3.0 combine reducers is no long necessary, you can just pass an object to the store:
+```javascript
+//store/store.js
+import { createStore } from 'r2s';
+import counterReducer$ from './counter/reducer';
 
+const reducers = {
+  counter: counterReducer$
+}
+
+const store$ = createStore(reducers);
+export default store$;
+```
 Here we add all our reducers passing an object. The property name will be the same in the State.
 Then we create and export our Store.
 
@@ -126,11 +163,16 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps, counterActions)(Counter)
 ```
 
-The first argument of the connect function is a function which receives the state and returns an object, which will be passed to the component as Props. The rest of the arguments are actions objects (the ones with Subjects) which will be passed as props functions.
+The first argument of the connect function is a function which receives the state and returns an object, which will be passed to the component as Props.
+The second argument is an actions object  (with Subjects as properties values) which will be passed as props functions. And the Third object is for passing anything else you want as props.
 
 The connect can receive n actions objects as arguments, as follows:
 ```javascript
-export default connect(({counter, user}) =>  ({counter, user}), userActions, counterActions)(Counter)
+export default connect(
+	({counter, user}) =>  ({counter, user}),
+	{...userActions, ...counterActions},
+	{otherProp: 'foo'}
+)(Counter)
 ```
 
 Please note the you are not required to use the actions on the connect, the following works too:
