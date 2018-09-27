@@ -1,6 +1,6 @@
 {
   "name": "r2s",
-  "version": "0.3.21",
+  "version": "0.3.23",
   "description": "A Rxjs state management library for React",
   "main": "build/index.js",
   "typings": "index.d.ts",

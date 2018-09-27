@@ -57,29 +57,30 @@ const reducers = [
 export default createReducers(initialState, reducers);
 
 ```
-The **createReducers** function is an helper that creates an Behavior Subject and merges the functions from the reducers array. The Following code is equivalent to the above:
+The **createReducers** function is an helper that creates an Observable observed by the exported Behavior Subject, it's necessary to keep changes in the state before any observer subscribes and merges the functions from the reducers array. The Following code is equivalent to the above:
 ```javascript
 //store/counter/reducer.js
-import { BehaviorSubject } from 'rxjs';
-import { map, merge, mergeScan, publishReplay, refCount } from 'rxjs/operators';
+import { BehaviorSubject, of } from 'rxjs';
+import { map, merge, mergeScan } from 'rxjs/operators';
 
 import counterActions from './actions';
 
 const initialState = 0;
 
-export default new BehaviorSubject(() => initialState)
+const observable = of(() => initialState)
 .pipe(
-  merge(
-    counterActions.increase.pipe(map(() => state => state + 1)),
-  	counterActions.decrease.pipe(map(() => state => state - 1)),
-  	counterActions.reset.pipe(map(() => () => initialState))
-  ),
-  mergeScan((state, reducer) => {
-    return of(reducer(state))
-  }, initialState),
-  publishReplay(1),
-  refCount()
+	merge(
+		...reducers
+	),
+	mergeScan((state, reducer) => {
+		return of(reducer(state))
+	}, initialState),
 )
+
+const subject = new BehaviorSubject(initialState)
+observable.subscribe(a => subject.next(a))
+
+export default subject
 ```
 What we do is create a new observable from the initial state with [**of**](https://rxjs-dev.firebaseapp.com/api/index/function/of) and  [**merge**](https://rxjs-dev.firebaseapp.com/api/index/function/merge) all streams into a single Observable.
 Each stream's content is [**map**](https://rxjs-dev.firebaseapp.com/api/operators/map)ped to a function that receives the current state so we can use it to return the new one. This function is where the Reducers pure functions act, always returning a new state.
