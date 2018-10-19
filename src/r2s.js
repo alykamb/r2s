@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import {BehaviorSubject, Observable, of, pipe, Subject } from "rxjs";
-import { combineAll, map, merge, mergeAll, mergeScan, switchMap } from 'rxjs/operators';
+import { combineAll, map, merge, mergeAll, mergeScan, takeUntil, switchMap } from 'rxjs/operators';
 
 export function createAction() {
   return new Subject();
@@ -75,6 +75,37 @@ export function connect(selector = state => state, actionSubjects = {}, otherPro
 
        componentWillUnmount() {
         this.subscription.unsubscribe();
+      }
+
+       render() {
+        return (
+          <WrappedComponent {...this.state} {...this.props} {...otherProps} {...actions} />
+        );
+      }
+    };
+  };
+}
+
+export function subscribe(observables, actionSubjects = {}, otherProps = {}) {
+  let actions = {}
+
+  const a = Object.keys(actionSubjects)
+  .reduce((akk:any, key) => ({ ...akk, [key]: value => actionSubjects[key].next(value) }), {})
+  actions = {...actions, ...a}
+
+
+  return function wrapWithConnect(WrappedComponent) {
+    return class Connect extends React.Component {
+        unsubscribe = new Subject()
+
+       componentWillMount() {
+         Object.keys(observables).forEach(key => {
+           observables[key].pipe(takeUntil(this.unsubscribe)).subscribe(value => {this.setState({[key]:value})})
+         })
+      }
+
+      componentWillUnmount() {
+        this.unsubscribe.next(true)
       }
 
        render() {
