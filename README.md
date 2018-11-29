@@ -40,6 +40,7 @@ export default counterActions
 ### Create Reducers
 ```javascript
 //store/counter/reducer.js
+import { merge } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import counterActions from './actions';
@@ -48,16 +49,16 @@ import {createReducers} from '@/r2s'
 
 const initialState = 0;
 
-const reducers = [
+const reducers$ = merge (
 	counterActions.increase.pipe(map(() => state => state + 1)),
 	counterActions.decrease.pipe(map(() => state => state - 1)),
 	counterActions.reset.pipe(map(() => () => initialState))
-]
+)
 
-export default createReducers(initialState, reducers);
+export default createReducers(initialState, reducers$);
 
 ```
-The **createReducers** function is an helper that creates an Observable observed by the exported Behavior Subject, it's necessary to keep changes in the state before any observer subscribes and merges the functions from the reducers array. The Following code is equivalent to the above:
+The **createReducers** function is an helper that creates an Observable subscribed by the exported Behavior Subject. It needs to be this way if there's a chance that an action will be called before the first component subscribes. The Following code is equivalent to the above:
 ```javascript
 //store/counter/reducer.js
 import { BehaviorSubject, of } from 'rxjs';
@@ -65,12 +66,18 @@ import { map, merge, mergeScan } from 'rxjs/operators';
 
 import counterActions from './actions';
 
+const reducers$ = merge (
+	counterActions.increase.pipe(map(() => state => state + 1)),
+	counterActions.decrease.pipe(map(() => state => state - 1)),
+	counterActions.reset.pipe(map(() => () => initialState))
+)
+
 const initialState = 0;
 
 const observable = of(() => initialState)
 .pipe(
 	merge(
-		...reducers
+		reducers$
 	),
 	mergeScan((state, reducer) => {
 		return of(reducer(state))
@@ -92,57 +99,14 @@ counterActions.setValue.pipe(map(payload => () => payload))
 counterActions.addValue.pipe(map(payload => state => state + payload))
 ```
 
-### Combine Reducers and create the Store
-
-```javascript
-//store/store.js
-import { combineReducers, createStore } from 'r2s';
-import counterReducer$ from './counter/reducer';
-
-const reducers = combineReducers({
-  counter: counterReducer$
-})
-
-const store$ = createStore(reducers);
-export default store$;
-```
-As of 3.0 combine reducers is no long necessary, you can just pass an object to the store:
-```javascript
-//store/store.js
-import { createStore } from 'r2s';
-import counterReducer$ from './counter/reducer';
-
-const reducers = {
-  counter: counterReducer$
-}
-
-const store$ = createStore(reducers);
-export default store$;
-```
-Here we add all our reducers passing an object. The property name will be the same in the State.
-Then we create and export our Store.
-
-### Add Provider to our App
-
-```javascript
-//index.js
-import { Provider } from "r2s";
-import store from './store';
-
-ReactDOM.render(
-  <Provider state$={store}>
-    <App />
-  </Provider>,
-  document.getElementById('root'));
-```
-
-### Create a component and connect to the store
+### Create a component and subscribe to the Observable
 
 ```javascript
 //Counter.js
 import React from 'react';
-import {connect} from 'r2s';
+import {subscribe} from 'r2s';
 import counterActions from './store/counter/actions'
+import counter$ from './store/counter/reducers'
 
 function Counter(props) {
   return (
@@ -155,21 +119,20 @@ function Counter(props) {
   )
 }
 
-function mapStateToProps(state) {
-  return {
-    counter: state.counter
+	const observables = {
+    counter: counter$
   }
-}
 
-export default connect(mapStateToProps, counterActions)(Counter)
+
+export default subscribe(observables, counterActions)(Counter)
 ```
 
-The first argument of the connect function is a function which receives the state and returns an object, which will be passed to the component as Props.
+The first argument of the subscribe function is an object which the properties are the names passed down as Props to the component.
 The second argument is an actions object  (with Subjects as properties values) which will be passed as props functions. And the Third object is for passing anything else you want as props.
 
-The connect can receive n actions objects as arguments, as follows:
+The subscribe can receive n actions objects as arguments, as follows:
 ```javascript
-export default connect(
+export default subscribe(
 	({counter, user}) =>  ({counter, user}),
 	{...userActions, ...counterActions},
 	{otherProp: 'foo'}
@@ -180,7 +143,7 @@ Please note the you are not required to use the actions on the connect, the foll
 ```javascript
 //Counter.js
 import React from 'react';
-import {connect} from 'r2s';
+import {subscribe} from 'r2s';
 import counterActions from './store/counter/actions'
 
 function Counter({counter, increase, decrease, reset}) {
@@ -194,12 +157,12 @@ function Counter({counter, increase, decrease, reset}) {
   )
 }
 
-export default connect(({counter}) =>  ({counter}))(Counter)
+export default subscribe(({counter}) =>  ({counter}))(Counter)
 ```
 
 ## Async Actions
 
-For the async actions, while the code can be added anywhere between the Subject and the last Reducer Map, i found it easier to maintain in a middle file, similar to actions itself. I called it effects for my experience with [**Ngrx**](https://github.com/ngrx/platform)
+For the async actions, while the code can be added anywhere between the Subject and the last Reducer Map, I found it easier to maintain in a middle file, similar to actions itself. I called it effects for my experience with [**Ngrx**](https://github.com/ngrx/platform)
 
 So an effects file would be:
 

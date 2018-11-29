@@ -1,13 +1,12 @@
 {
   "name": "r2s",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "A Rxjs state management library for React",
-  "main": "build/index.js",
+  "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack --watch",
-    "build": "webpack --mode production"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -26,23 +25,10 @@
     "url": "https://github.com/alykamb/r2s/issues"
   },
   "homepage": "https://github.com/alykamb/r2s#readme",
-  "dependencies": {
-    "prop-types": "^15.6.2"
-  },
   "devDependencies": {
     "@types/react": "^16.4.11",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.5",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1",
     "react": "^16.5.2",
-    "rxjs": "^6.3.3",
-    "webpack": "^4.17.1",
-    "webpack-command": "^0.4.1"
+    "rxjs": "^6.3.3"
   },
   "peerDependencies": {
     "react": "16.x",
